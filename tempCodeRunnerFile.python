@@ -1,0 +1,327 @@
+import random
+# ----------------------------------------------------------
+# 1. DATA GENERATION
+# ----------------------------------------------------------
+
+first_names = [
+    "Ahmed", "Mohamed", "Ali", "Omar", "Hassan", "Khaled", "Youssef",
+    "Ibrahim", "Mahmoud", "Tarek", "Sara", "Nour", "Aya", "Mona",
+    "Hana", "Rania", "Dina", "Layla", "Yasmine", "Mariam",
+    "James", "John", "David", "Michael", "Chris", "Emma", "Olivia",
+    "Sophia", "Liam", "Noah", "Ethan", "Lucas", "Mason", "Logan"
+]
+
+last_names = [
+    "Hassan", "Ali", "Mohamed", "Ahmed", "Omar", "Khalil", "Nasser",
+    "Salem", "Farouk", "Zaki", "Smith", "Johnson", "Williams", "Brown",
+    "Jones", "Garcia", "Miller", "Davis", "Wilson", "Moore"
+]
+
+departments = ["Sales", "Engineering", "HR", "Marketing", "Finance", "Operations"]
+genders = ["Male", "Female"]
+
+random.seed(42)  # للحصول على نفس البيانات كل مرة
+
+employees = []
+
+for i in range(1, 61):  # 60 موظف
+    emp = {
+        "id": f"EMP{i:03d}",
+        "name": random.choice(first_names) + " " + random.choice(last_names),
+        "department": random.choice(departments),
+        "gender": random.choice(genders),
+        "salary": round(random.uniform(4000, 20000), 2),
+        "bonus_pct": round(random.uniform(5, 30), 2),
+        "sales_amount": round(random.uniform(10000, 200000), 2),
+        "attendance_pct": round(random.uniform(60, 100), 2),
+        "years_of_service": random.randint(1, 20),
+    }
+    employees.append(emp)
+
+# ----------------------------------------------------------
+# 2. HELPER FUNCTIONS
+# ----------------------------------------------------------
+
+def separator(title=""):
+    if title:
+        print(f"\n{'='*60}")
+        print(f"   {title}")
+        print(f"{'='*60}")
+    else:
+        print("-" * 60)
+
+def calc_performance_score(emp):
+    """
+    Performance Score Formula:
+    Score = (attendance * 0.3) + (sales/2000 * 0.3) + (bonus_pct * 0.2) + (years * 0.2)
+    """
+    score = (
+        emp["attendance_pct"] * 0.30 +
+        (emp["sales_amount"] / 2000) * 0.30 +
+        emp["bonus_pct"] * 0.20 +
+        emp["years_of_service"] * 0.20
+    )
+    return round(score, 2)
+
+def calc_total_compensation(emp):
+    return round(emp["salary"] + emp["salary"] * emp["bonus_pct"] / 100, 2)
+
+# ----------------------------------------------------------
+# 3. BASIC STATISTICS
+# ----------------------------------------------------------
+
+separator("1. BASIC STATISTICS")
+
+salaries = [e["salary"] for e in employees]
+total_salary = sum(salaries)
+avg_salary   = total_salary / len(salaries)
+max_salary   = max(salaries)
+min_salary   = min(salaries)
+
+print(f"  Total Employees   : {len(employees)}")
+print(f"  Total Salary Bill : ${total_salary:,.2f}")
+print(f"  Average Salary    : ${avg_salary:,.2f}")
+print(f"  Highest Salary    : ${max_salary:,.2f}")
+print(f"  Lowest  Salary    : ${min_salary:,.2f}")
+
+attendance_vals = [e["attendance_pct"] for e in employees]
+print(f"  Avg Attendance    : {sum(attendance_vals)/len(attendance_vals):.2f}%")
+
+sales_vals = [e["sales_amount"] for e in employees]
+print(f"  Total Sales       : ${sum(sales_vals):,.2f}")
+print(f"  Avg Sales         : ${sum(sales_vals)/len(sales_vals):,.2f}")
+
+# ----------------------------------------------------------
+# 4. TOP & BOTTOM PERFORMERS
+# ----------------------------------------------------------
+
+separator("2. TOP & BOTTOM PERFORMERS (by Performance Score)")
+
+scored = [(e, calc_performance_score(e)) for e in employees]
+scored_sorted = sorted(scored, key=lambda x: x[1], reverse=True)
+
+print("\n  🏆 TOP 5 PERFORMERS:")
+for rank, (emp, score) in enumerate(scored_sorted[:5], 1):
+    print(f"    {rank}. {emp['name']:<25} [{emp['department']}]  Score: {score}")
+
+print("\n  ⚠️  BOTTOM 5 PERFORMERS:")
+for rank, (emp, score) in enumerate(scored_sorted[-5:], 1):
+    print(f"    {rank}. {emp['name']:<25} [{emp['department']}]  Score: {score}")
+
+best_emp, best_score = scored_sorted[0]
+print(f"\n  ⭐ BEST EMPLOYEE OVERALL: {best_emp['name']} (Score: {best_score})")
+
+# ----------------------------------------------------------
+# 5. FILTERING
+# ----------------------------------------------------------
+
+separator("3. FILTERING EMPLOYEES")
+
+# موظفين راتبهم أعلى من 15000
+high_earners = [e for e in employees if e["salary"] > 15000]
+print(f"\n  Employees with Salary > $15,000       : {len(high_earners)}")
+
+# موظفين حضور أقل من 75%
+low_attendance = [e for e in employees if e["attendance_pct"] < 75]
+print(f"  Underperforming (Attendance < 75%)    : {len(low_attendance)}")
+
+# موظفين في Sales ومبيعاتهم فوق 100000
+top_sales = [e for e in employees
+             if e["department"] == "Sales" and e["sales_amount"] > 100000]
+print(f"  Sales Dept with Sales > $100,000      : {len(top_sales)}")
+
+# موظفين خبرة أكثر من 10 سنين وراتب فوق 10000
+senior_high = [e for e in employees
+               if e["years_of_service"] > 10 and e["salary"] > 10000]
+print(f"  Senior (>10 yrs) & Salary > $10,000   : {len(senior_high)}")
+
+# ----------------------------------------------------------
+# 6. GROUPING BY DEPARTMENT
+# ----------------------------------------------------------
+
+separator("4. DEPARTMENT ANALYSIS")
+
+dept_groups = {}
+for emp in employees:
+    dept = emp["department"]
+    if dept not in dept_groups:
+        dept_groups[dept] = []
+    dept_groups[dept].append(emp)
+
+print(f"\n  {'Department':<15} {'Count':>6} {'Avg Salary':>12} {'Avg Attend':>12} {'Total Sales':>14}")
+print("  " + "-" * 62)
+for dept, emps in sorted(dept_groups.items()):
+    count       = len(emps)
+    avg_sal     = sum(e["salary"] for e in emps) / count
+    avg_att     = sum(e["attendance_pct"] for e in emps) / count
+    total_sales = sum(e["sales_amount"] for e in emps)
+    print(f"  {dept:<15} {count:>6} {avg_sal:>12,.2f} {avg_att:>11.2f}% {total_sales:>14,.2f}")
+
+# ----------------------------------------------------------
+# 7. COUNTING PER CATEGORY
+# ----------------------------------------------------------
+
+separator("5. COUNTING PER CATEGORY")
+
+# عدد الموظفين حسب الجنس
+gender_count = {}
+for emp in employees:
+    g = emp["gender"]
+    gender_count[g] = gender_count.get(g, 0) + 1
+print(f"\n  Gender Distribution:")
+for g, c in gender_count.items():
+    pct = c / len(employees) * 100
+    print(f"    {g:<10}: {c} ({pct:.1f}%)")
+
+# عدد الموظفين حسب فئة الراتب
+salary_brackets = {"< $6k": 0, "$6k-$10k": 0, "$10k-$15k": 0, "> $15k": 0}
+for emp in employees:
+    s = emp["salary"]
+    if s < 6000:
+        salary_brackets["< $6k"] += 1
+    elif s < 10000:
+        salary_brackets["$6k-$10k"] += 1
+    elif s < 15000:
+        salary_brackets["$10k-$15k"] += 1
+    else:
+        salary_brackets["> $15k"] += 1
+
+print(f"\n  Salary Brackets:")
+for bracket, count in salary_brackets.items():
+    print(f"    {bracket:<12}: {count} employees")
+
+# ----------------------------------------------------------
+# 8. SET OPERATIONS
+# ----------------------------------------------------------
+
+separator("6. SET OPERATIONS — COMPARING GROUPS")
+
+# مجموعة IDs
+high_salary_ids  = {e["id"] for e in employees if e["salary"] > 12000}
+high_sales_ids   = {e["id"] for e in employees if e["sales_amount"] > 100000}
+high_attend_ids  = {e["id"] for e in employees if e["attendance_pct"] >= 90}
+
+print(f"\n  High Salary (>$12k)       : {len(high_salary_ids)} employees")
+print(f"  High Sales  (>$100k)      : {len(high_sales_ids)} employees")
+print(f"  High Attendance (>=90%)   : {len(high_attend_ids)} employees")
+
+both_salary_sales = high_salary_ids & high_sales_ids
+print(f"\n  High Salary AND High Sales           : {len(both_salary_sales)} employees")
+
+either_salary_sales = high_salary_ids | high_sales_ids
+print(f"  High Salary OR  High Sales           : {len(either_salary_sales)} employees")
+
+salary_not_sales = high_salary_ids - high_sales_ids
+print(f"  High Salary but NOT High Sales       : {len(salary_not_sales)} employees")
+
+triple_star = high_salary_ids & high_sales_ids & high_attend_ids
+print(f"  All Three (Salary+Sales+Attendance)  : {len(triple_star)} employees")
+if triple_star:
+    triple_emps = [e for e in employees if e["id"] in triple_star]
+    for e in triple_emps:
+        print(f"    → {e['name']} [{e['department']}]")
+
+# ----------------------------------------------------------
+# 9. SORTING
+# ----------------------------------------------------------
+
+separator("7. SORTING EXAMPLES")
+
+by_salary_desc = sorted(employees, key=lambda e: e["salary"], reverse=True)
+print("\n  Top 3 by Salary:")
+for e in by_salary_desc[:3]:
+    print(f"    {e['name']:<25} ${e['salary']:,.2f}")
+
+by_years_desc = sorted(employees, key=lambda e: e["years_of_service"], reverse=True)
+print("\n  Top 3 Most Senior:")
+for e in by_years_desc[:3]:
+    print(f"    {e['name']:<25} {e['years_of_service']} years")
+
+# ----------------------------------------------------------
+# 10. DICTIONARY MAPPINGS
+# ----------------------------------------------------------
+
+separator("8. DICTIONARY MAPPINGS")
+
+# Department -> List of employee names
+dept_to_names = {}
+for emp in employees:
+    dept = emp["department"]
+    if dept not in dept_to_names:
+        dept_to_names[dept] = []
+    dept_to_names[dept].append(emp["name"])
+
+print("\n  Department → Employees (first 3 shown):")
+for dept, names in sorted(dept_to_names.items()):
+    preview = ", ".join(names[:3])
+    print(f"    {dept:<15}: {preview}{'...' if len(names)>3 else ''}")
+
+# Employee ID -> Total Compensation
+id_to_compensation = {
+    emp["id"]: calc_total_compensation(emp)
+    for emp in employees
+}
+
+print(f"\n  Sample ID → Total Compensation:")
+sample_ids = list(id_to_compensation.items())[:5]
+for eid, comp in sample_ids:
+    print(f"    {eid}: ${comp:,.2f}")
+
+# ----------------------------------------------------------
+# 11. ANALYTICAL METRICS
+# ----------------------------------------------------------
+
+separator("9. ANALYTICAL METRICS")
+
+avg_sal = sum(e["salary"] for e in employees) / len(employees)
+above_avg = [e for e in employees if e["salary"] > avg_sal]
+pct_above = len(above_avg) / len(employees) * 100
+print(f"\n  % Employees above Average Salary     : {pct_above:.1f}%")
+
+underperform = [e for e in employees if e["attendance_pct"] < 75]
+print(f"  Underperforming (Attendance < 75%)   : {len(underperform)} employees")
+
+zero_bonus_risk = [e for e in employees
+                   if e["attendance_pct"] < 80 and e["sales_amount"] < 30000]
+print(f"  At-Risk (Low Attend + Low Sales)     : {len(zero_bonus_risk)} employees")
+
+total_comp_all = sum(calc_total_compensation(e) for e in employees)
+print(f"  Total Compensation (Salary+Bonus)    : ${total_comp_all:,.2f}")
+
+avg_perf = sum(calc_performance_score(e) for e in employees) / len(employees)
+print(f"  Average Performance Score            : {avg_perf:.2f}")
+
+# ----------------------------------------------------------
+# 12. TUPLES USAGE — SUMMARY REPORT
+# ----------------------------------------------------------
+
+separator("10. SUMMARY TUPLES (Immutable Snapshots)")
+
+dept_summary_tuples = []
+for dept, emps in dept_groups.items():
+    avg_perf_dept = sum(calc_performance_score(e) for e in emps) / len(emps)
+    summary = (dept, len(emps), round(avg_perf_dept, 2))
+    dept_summary_tuples.append(summary)
+
+dept_summary_tuples = sorted(dept_summary_tuples, key=lambda x: x[2], reverse=True)
+
+print("\n  (Department, Headcount, Avg Performance Score):")
+for tup in dept_summary_tuples:
+    print(f"    {tup}")
+
+# ----------------------------------------------------------
+# FINAL SUMMARY
+# ----------------------------------------------------------
+
+separator("FINAL SUMMARY")
+print(f"""
+  Total Employees        : {len(employees)}
+  Best Performer         : {best_emp['name']} (Score: {best_score})
+  Highest Salary Dept    : {max(dept_groups, key=lambda d: sum(e['salary'] for e in dept_groups[d])/len(dept_groups[d]))}
+  Most Employees in Dept : {max(dept_groups, key=lambda d: len(dept_groups[d]))}
+  Underperformers        : {len(underperform)} ({len(underperform)/len(employees)*100:.1f}%)
+  Total Payroll          : ${total_comp_all:,.2f}
+""")
+separator()
+print("  ✅ Analysis Complete!")
+separator()
