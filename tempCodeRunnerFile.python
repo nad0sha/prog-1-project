@@ -2,7 +2,7 @@ import random
 # ----------------------------------------------------------
 # 1. DATA GENERATION
 # ----------------------------------------------------------
-
+ 
 first_names = [
     "Ahmed", "Mohamed", "Ali", "Omar", "Hassan", "Khaled", "Youssef",
     "Ibrahim", "Mahmoud", "Tarek", "Sara", "Nour", "Aya", "Mona",
