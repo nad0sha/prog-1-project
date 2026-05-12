@@ -12,7 +12,7 @@ first_names = [
 ]
 
 last_names = [
-    "Hassan", "Ali", "Mohamed", "Ahmed", "Omar", "Khalil", "Nasser",
+    "Hassan", "Ali", "Mohamed", "Ahmed", "Omar", "Khal
     "Salem", "Farouk", "Zaki", "Smith", "Johnson", "Williams", "Brown",
     "Jones", "Garcia", "Miller", "Davis", "Wilson", "Moore"
 ]
