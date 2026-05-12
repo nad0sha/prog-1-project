@@ -313,7 +313,7 @@ for tup in dept_summary_tuples:
 # FINAL SUMMARY
 # ----------------------------------------------------------
 
-separator("FINAL SUMMARY")
+separator("FINAL SUMMARY")  
 print(f"""
   Total Employees        : {len(employees)}
   Best Performer         : {best_emp['name']} (Score: {best_score})
