@@ -1,0 +1,75 @@
+{% extends "base.html" %}
+{% block content %}
+
+<h1 class="mb-4">👨‍🍳 Admin Dashboard</h1>
+
+<h3>Total Revenue: {{ revenue }} EGP</h3>
+
+<hr>
+
+<h2>📦 Orders</h2>
+
+{% for order in orders %}
+<div class="card p-3 mb-3">
+
+<p><strong>ID:</strong> {{ order["id"] }}</p>
+<p><strong>Items:</strong> {{ order["items"] }}</p>
+<p><strong>Total:</strong> {{ order["total"] }} EGP</p>
+
+<p>
+<strong>Status:</strong>
+{% if order["status"] == "pending" %}
+<span class="text-warning">Pending</span>
+{% else %}
+<span class="text-success">Done</span>
+{% endif %}
+</p>
+
+{% if order["status"] == "pending" %}
+<a href="/complete_order/{{ order['id'] }}" class="btn btn-success">
+Done ✅
+</a>
+{% endif %}
+
+</div>
+{% endfor %}
+
+<hr>
+
+<h3>Add New Item</h3>
+
+<form method="POST" action="/add_item" enctype="multipart/form-data">
+
+<input class="form-control mb-2" name="name" placeholder="Item Name" required>
+
+<input class="form-control mb-2" name="price" placeholder="Price" required>
+
+<input class="form-control mb-2" type="file" name="image">
+
+<button type="submit" class="btn btn-success w-100">Add Item</button>
+
+</form>
+
+<hr>
+
+<h3>Menu Items</h3>
+
+{% for item in items %}
+<div class="card p-3 mb-3">
+
+<img src="{{ url_for('static', filename='uploads/' + item['image']) }}" width="120">
+
+<form method="POST" action="/edit_item/{{ item['id'] }}">
+<input class="form-control mb-2" name="name" value="{{ item['name'] }}">
+<input class="form-control mb-2" name="price" value="{{ item['price'] }}">
+<button class="btn btn-warning">Update</button>
+</form>
+
+<a href="/delete_item/{{ item['id'] }}" class="btn btn-danger mt-2">Delete</a>
+
+</div>
+{% endfor %}
+
+<a href="/admin_logout" class="btn btn-dark mt-3">Logout</a>
+
+{% endblock %}
