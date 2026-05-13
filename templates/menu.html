@@ -1,0 +1,29 @@
+{% extends "base.html" %}
+{% block content %}
+
+<h1 class="text-center mb-4">🍔 Menu</h1>
+
+<div class="row">
+
+{% for item in menu %}
+<div class="col-md-3">
+
+<div class="card shadow mb-4">
+
+<img src="{{ url_for('static', filename='uploads/' + item['image']) }}" class="card-img-top">
+
+<div class="card-body text-center">
+<h5>{{ item['name'] }}</h5>
+<p class="text-success">{{ item['price'] }} EGP</p>
+
+<a href="/add/{{ item['id'] }}" class="btn btn-success w-100">Add</a>
+</div>
+
+</div>
+
+</div>
+{% endfor %}
+
+</div>
+
+{% endblock %}
