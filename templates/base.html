@@ -1,0 +1,95 @@
+<!DOCTYPE html>
+<html>
+<head>
+<title>Restaurant</title>
+
+<link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+
+<style>
+body { transition:0.3s; }
+
+.light-mode { background:#f8f9fa; color:black; }
+.dark-mode { background:#121212; color:white; }
+
+.dark-mode .card { background:#1e1e1e; color:white; }
+.dark-mode .navbar { background:#000 !important; }
+
+.card { border-radius:15px; transition:0.3s; }
+.card:hover { transform:scale(1.05); }
+
+.btn { border-radius:20px; }
+</style>
+
+</head>
+
+<body class="light-mode" id="body">
+
+<nav class="navbar navbar-dark bg-dark p-3">
+<div class="container">
+
+<a class="navbar-brand">🍽️ Restaurant</a>
+
+<div>
+<a href="/" class="btn btn-light">Home</a>
+<a href="/menu" class="btn btn-light">Menu</a>
+<a href="/cart" class="btn btn-warning">Cart</a>
+
+{% if user %}
+    
+    {% if session.get("role") == "admin" %}
+        <a href="/admin_login" class="btn btn-danger">Admin</a>
+    {% endif %}
+
+    <a href="/logout" class="btn btn-outline-light">Logout</a>
+
+{% else %}
+
+    <a href="/login" class="btn btn-success">Login</a>
+    <a href="/register" class="btn btn-primary">Register</a>
+
+{% endif %}
+
+<button onclick="toggleMode()" id="modeBtn" class="btn btn-secondary">🌙</button>
+
+</div>
+
+</div>
+</nav>
+
+<div class="container mt-4">
+{% block content %}{% endblock %}
+</div>
+
+<script>
+function toggleMode() {
+    let body = document.getElementById("body");
+    let btn = document.getElementById("modeBtn");
+
+    if (body.classList.contains("light-mode")) {
+        body.classList.remove("light-mode");
+        body.classList.add("dark-mode");
+        btn.innerText = "☀️";
+        localStorage.setItem("mode", "dark");
+    } else {
+        body.classList.remove("dark-mode");
+        body.classList.add("light-mode");
+        btn.innerText = "🌙";
+        localStorage.setItem("mode", "light");
+    }
+}
+
+window.onload = function() {
+    let mode = localStorage.getItem("mode");
+    let btn = document.getElementById("modeBtn");
+
+    if (mode === "dark") {
+        document.getElementById("body").classList.add("dark-mode");
+        btn.innerText = "☀️";
+    } else {
+        btn.innerText = "🌙";
+    }
+}
+</script>
+
+</body>
+</html>
